@@ -1,0 +1,210 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  TVCA-app
+
+  Sample SAM Template for TVCA-app
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+
+Parameters:
+  FirebaseClientEmail:
+    Type: String
+
+  FirebasePrivateKey:
+    Type: String
+
+  FirebaseProjectId:
+    Type: String
+
+  LineChannelAccessToken:
+    Type: String
+
+  LineChannelSecret:
+    Type: String
+
+  WhereAreYouLocationUrl:
+    Type: String
+
+  WhereAreYouUrlToken:
+    Type: String
+
+  AlexaEnterleaveSkillId:
+    Type: String
+
+Resources:
+###############
+# API GATEWAY #
+###############
+  LineExpressApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: LineApiGateway
+      EndpointConfiguration:
+        Type: REGIONAL
+      StageName: work
+
+##########
+# LAYERS #
+##########
+  LineLayer:
+    Type: AWS::Serverless::LayerVersion
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: LineLayer
+      ContentUri: layers/layer_line/
+      CompatibleRuntimes:
+        - nodejs18.x
+      CompatibleArchitectures:
+        - arm64
+
+  ExpressLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: ExpressLayer
+      ContentUri: layers/layer_express/
+      CompatibleRuntimes:
+        - nodejs18.x
+      CompatibleArchitectures:
+        - arm64
+
+  FirebaseLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: FirebaseLayer
+      ContentUri: layers/layer_firebase/
+      CompatibleRuntimes:
+        - nodejs18.x
+      CompatibleArchitectures:
+        - arm64
+
+  AlexaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: AlexaLayer
+      ContentUri: layers/layer_alexa/
+      CompatibleRuntimes:
+        - nodejs18.x
+      CompatibleArchitectures:
+        - arm64
+
+  ToolsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: ToolsLayer
+      ContentUri: layers/layer_tools/
+      CompatibleRuntimes:
+        - nodejs18.x
+      CompatibleArchitectures:
+        - arm64
+
+###################
+# LAMBDA FUNCTION #
+###################
+  LineLambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: LineLambdaFunction
+      Handler: index.lineHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      CodeUri: lambdas/line_lambda/
+      Description: ''
+      MemorySize: 128
+      Timeout: 10
+      Environment:
+        Variables:
+          FIREBASE_CLIENT_EMAIL: !Ref FirebaseClientEmail
+          FIREBASE_PRIVATE_KEY: !Ref FirebasePrivateKey
+          FIREBASE_PROJECT_ID: !Ref FirebaseProjectId
+          LINE_CHANNEL_ACCESS_TOKEN: !Ref LineChannelAccessToken
+          LINE_CHANNEL_SECRET: !Ref LineChannelSecret
+          WHERE_ARE_YOU_LOCATION_URL: !Ref WhereAreYouLocationUrl
+          WHERE_ARE_YOU_URL_TOKEN: !Ref WhereAreYouUrlToken
+      Layers:
+        - !Ref LineLayer
+        - !Ref ExpressLayer
+        - !Ref FirebaseLayer
+        - !Ref ToolsLayer
+
+      Events:
+        LineApiEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: any
+            Path: /{proxy+}
+            Method: any
+            RestApiId: !Ref LineExpressApi
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+        - index.ts
+
+  AlexaLambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: AlexaLambdaFunction
+      Handler: index.alexaHandler
+      Runtime: nodejs18.x
+      CodeUri: lambdas/alexa_lambda/
+      Description: ''
+      MemorySize: 128
+      Timeout: 10
+      Environment:
+        Variables:
+          ALEXA_ENTERLEAVE_SKILL_ID: !Ref AlexaEnterleaveSkillId
+          FIREBASE_CLIENT_EMAIL: !Ref FirebaseClientEmail
+          FIREBASE_PRIVATE_KEY: !Ref FirebasePrivateKey
+          FIREBASE_PROJECT_ID: !Ref FirebaseProjectId
+      Layers:
+        - !Ref FirebaseLayer
+        - !Ref AlexaLayer
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+        - index.ts
+
+#############
+# LOG GROUP #
+#############
+  LineLambdaFuncLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${LineLambdaFunction}
+      RetentionInDays: 7
+
+  AlexaLambdaFuncLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AlexaLambdaFunction}
+      RetentionInDays: 7
+
+Outputs:
+  # ServerloessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+#  HelloWorldApi:
+#    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+#    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  LineLambdaFunction:
+    Description: "Line Lambda Function ARN"
+    Value: !GetAtt LineLambdaFunction.Arn
+  AlexaLambdaFunction:
+    Description: "Alexa Lambda Function ARN"
+    Value: !GetAtt AlexaLambdaFunction.Arn
+#  HelloWorldFunctionIamRole:
+#    Description: "Implicit IAM Role created for Hello World function"
+#    Value: !GetAtt HelloWorldFunctionRole.Arn
