@@ -1,7 +1,6 @@
-"use strict";
+'use strict';
 
 import serverlessExpress from '@vendia/serverless-express';
-import app from './top_url_point.mjs';
-
+import app from './top_url_point.js';
 
 export const handler = serverlessExpress({ app });

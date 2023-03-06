@@ -1,10 +1,10 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   TVCA-app
 
   Sample SAM Template for TVCA-app
-  
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
@@ -36,9 +36,9 @@ Parameters:
     Type: String
 
 Resources:
-###############
-# API GATEWAY #
-###############
+  ###############
+  # API GATEWAY #
+  ###############
   LineExpressApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -47,17 +47,17 @@ Resources:
         Type: REGIONAL
       StageName: work
 
-##########
-# LAYERS #
-##########
+  ##########
+  # LAYERS #
+  ##########
   LineLayer:
-    Type: AWS::Serverless::LayerVersion
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: LineLayer
       ContentUri: layers/layer_line/
       CompatibleRuntimes:
         - nodejs18.x
+    Metadata:
       CompatibleArchitectures:
         - arm64
 
@@ -68,6 +68,7 @@ Resources:
       ContentUri: layers/layer_express/
       CompatibleRuntimes:
         - nodejs18.x
+    Metadata:
       CompatibleArchitectures:
         - arm64
 
@@ -78,6 +79,7 @@ Resources:
       ContentUri: layers/layer_firebase/
       CompatibleRuntimes:
         - nodejs18.x
+    Metadata:
       CompatibleArchitectures:
         - arm64
 
@@ -88,6 +90,7 @@ Resources:
       ContentUri: layers/layer_alexa/
       CompatibleRuntimes:
         - nodejs18.x
+    Metadata:
       CompatibleArchitectures:
         - arm64
 
@@ -98,14 +101,15 @@ Resources:
       ContentUri: layers/layer_tools/
       CompatibleRuntimes:
         - nodejs18.x
+    Metadata:
       CompatibleArchitectures:
         - arm64
 
-###################
-# LAMBDA FUNCTION #
-###################
+  ###################
+  # LAMBDA FUNCTION #
+  ###################
   LineLambdaFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: "AWS::Serverless::Function"
     Properties:
       FunctionName: LineLambdaFunction
       Handler: index.lineHandler
@@ -113,7 +117,7 @@ Resources:
       Architectures:
         - arm64
       CodeUri: lambdas/line_lambda/
-      Description: ''
+      Description: ""
       MemorySize: 128
       Timeout: 10
       Environment:
@@ -132,31 +136,44 @@ Resources:
         - !Ref ToolsLayer
 
       Events:
-        LineApiEvent:
+        LineApiRootEvent:
           Type: Api
           Properties:
-            Path: /
-            Method: any
-            Path: /{proxy+}
-            Method: any
             RestApiId: !Ref LineExpressApi
+            Path: /
+            Method: ANY
+        LineApiGreedyEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref LineExpressApi
+            Path: /{proxy+}
+            Method: ANY
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
         Target: "es2020"
         Sourcemap: true
-        EntryPoints: 
-        - index.ts
+        EntryPoints:
+          - index.ts
+        External:
+          - "@vendia/serverless-express"
+          - "express"
+          - "@line/bot-sdk"
+          - "firebase-admin/app"
+          - "firebase-admin"
+          - "firebase-admin/app"
+          - "firebase-admin/firestore"
+          - "date-fns"
 
   AlexaLambdaFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: "AWS::Serverless::Function"
     Properties:
       FunctionName: AlexaLambdaFunction
       Handler: index.alexaHandler
       Runtime: nodejs18.x
       CodeUri: lambdas/alexa_lambda/
-      Description: ''
+      Description: ""
       MemorySize: 128
       Timeout: 10
       Environment:
@@ -174,31 +191,38 @@ Resources:
         Minify: true
         Target: "es2020"
         Sourcemap: true
-        EntryPoints: 
-        - index.ts
+        EntryPoints:
+          - index.ts
+        External:
+          - "ask-sdk-core"
+          - "firebase-admin"
+          - "firebase-admin/app"
+          - "firebase-admin/firestore"
 
-#############
-# LOG GROUP #
-#############
+  #############
+  # LOG GROUP #
+  #############
   LineLambdaFuncLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub /aws/lambda/${LineLambdaFunction}
       RetentionInDays: 7
+    DependsOn: LineLambdaFunction
 
   AlexaLambdaFuncLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub /aws/lambda/${AlexaLambdaFunction}
       RetentionInDays: 7
+    DependsOn: AlexaLambdaFunction
 
 Outputs:
   # ServerloessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-#  HelloWorldApi:
-#    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-#    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  #  HelloWorldApi:
+  #    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+  #    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
   LineLambdaFunction:
     Description: "Line Lambda Function ARN"
     Value: !GetAtt LineLambdaFunction.Arn

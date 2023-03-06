@@ -1,11 +1,13 @@
 "use strict";
 
+import line, { MessageEvent } from '@line/bot-sdk';
+
 /**
  * Show LINE top menu.
  */
-function lineShowTopmenu(client, event) {
-    
-    return client.replyMessage(event.replyToken, {
+function lineShowTopmenu(line_client: line.Client, event: MessageEvent) {
+
+    return line_client.replyMessage(event.replyToken, {
         type: "template",
         altText: "This is a buttons template",
         template: {
