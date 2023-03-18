@@ -9,7 +9,7 @@ import line from '@line/bot-sdk';
 async function getInRoom(line_client: line.Client, event: line.PostbackEvent) {
 
     // read inroom status
-    const inroomRef = db.collection('state').doc('inroom').withConverter(doc_converter<stateInRoomTable[]>());
+    const inroomRef = db.doc('state/inroom').withConverter(doc_converter<stateInRoomTable[]>());
 
     const doc = await inroomRef.get();
     if (!doc.exists) {
