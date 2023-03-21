@@ -15,7 +15,8 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      - run: sam build --use-container --debug
+      - run: sed s/arm64/x86_64/g template.yaml > template_github_actions.yaml
+      - run: sam build --use-container -t template_github_actions.yaml --debug
       - run:
           sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --parameter-overrides
           FirebaseClientEmail=${{ secrets.FIREBASE_CLIENT_EMAIL }}
