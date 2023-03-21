@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "TVCA-app"
+s3_prefix = "TVCA-app"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+confirm_changeset = true
+[default.global.parameters]

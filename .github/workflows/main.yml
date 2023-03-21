@@ -16,9 +16,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - run: sed s/arm64/x86_64/g template.yaml > template_github_actions.yaml
-      - run: sam build --use-container -t template_github_actions.yaml --debug
-      - run:
-          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --parameter-overrides
+      - run: cp -p lambdas/line_lambda/db_functions.ts lambdas/alexa_lambda/db_functions.ts
+      - run: sam build --use-container -t template_github_actions.yaml --debug --config-file samconfig_github_actions.toml
+      - run: sam deploy
+          --no-confirm-changeset
+          --no-fail-on-empty-changeset
+          --config-file samconfig_github_actions.toml
+          --s3-bucket ${{ secrets.S3_BUCKET_NAME }}
+          --parameter-overrides
           FirebaseClientEmail=${{ secrets.FIREBASE_CLIENT_EMAIL }}
           FirebasePrivateKey=${{ secrets.FIREBASE_PRIVATE_KEY }}
           FirebaseProjectId=${{ secrets.FIREBASE_PROJECT_ID }}

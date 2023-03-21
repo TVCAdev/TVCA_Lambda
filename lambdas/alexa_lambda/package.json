@@ -12,5 +12,8 @@
     "@types/aws-lambda": "^8.10.111",
     "ask-sdk": "^2.12.1",
     "firebase-admin": "^11.5.0"
+  },
+  "dependencies": {
+    "esbuild": "^0.17.12"
   }
 }
