@@ -15,6 +15,16 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
+      - run: npm install
+        working-directory: ./layers/layer_alexa/nodejs
+      - run: npm install
+        working-directory: ./layers/layer_express/nodejs
+      - run: npm install
+        working-directory: ./layers/layer_firebase/nodejs
+      - run: npm install
+        working-directory: ./layers/layer_line/nodejs
+      - run: npm install
+        working-directory: ./layers/layer_tools/nodejs
       - run: sed s/arm64/x86_64/g template.yaml > template_github_actions.yaml
       - run: cp -p lambdas/line_lambda/db_functions.ts lambdas/alexa_lambda/db_functions.ts
       - run: sam build --use-container -t template_github_actions.yaml --debug --config-file samconfig_github_actions.toml
