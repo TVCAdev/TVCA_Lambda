@@ -34,10 +34,10 @@ jobs:
           --config-file samconfig_github_actions.toml
           --s3-bucket ${{ secrets.S3_BUCKET_NAME }}
           --parameter-overrides
-          "FirebaseClientEmail=${{ secrets.FIREBASE_CLIENT_EMAIL }}"
-          "FirebasePrivateKey=${{ secrets.FIREBASE_PRIVATE_KEY }}"
-          "FirebaseProjectId=${{ secrets.FIREBASE_PROJECT_ID }}"
-          "LineChannelAccessToken=${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}"
-          "LineChannelSecret=${{ secrets.LINE_CHANNEL_SECRET }}"
-          "WhereAreYouLocationUrl=${{ secrets.WHEREAREYOU_LOCATION_URL }}"
-          "WhereAreYouUrlToken=${{ secrets.WHEREAREYOU_URL_TOKEN }}"
+          "FirebaseClientEmail='${{ secrets.FIREBASE_CLIENT_EMAIL }}'"
+          "FirebasePrivateKey='${{ secrets.FIREBASE_PRIVATE_KEY }}'"
+          "FirebaseProjectId='${{ secrets.FIREBASE_PROJECT_ID }}'"
+          "LineChannelAccessToken='${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}'"
+          "LineChannelSecret='${{ secrets.LINE_CHANNEL_SECRET }}'"
+          "WhereAreYouLocationUrl='${{ secrets.WHEREAREYOU_LOCATION_URL }}'"
+          "WhereAreYouUrlToken='${{ secrets.WHEREAREYOU_URL_TOKEN }}'"
