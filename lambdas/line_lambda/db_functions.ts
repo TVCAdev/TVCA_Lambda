@@ -1,7 +1,7 @@
 'use strict';
 
 import { initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore, Firestore, WithFieldValue, QueryDocumentSnapshot } from 'firebase-admin/firestore';
+import { getFirestore, Firestore, WithFieldValue, QueryDocumentSnapshot, Timestamp } from 'firebase-admin/firestore';
 
 /*
  * Initialize Firebase
@@ -20,7 +20,6 @@ export const doc_converter = <T>() => ({
 });
 
 export interface stateInRoomTable {
-    roomName: string;
     inState: boolean;
 }
 
@@ -35,7 +34,7 @@ export interface configLocationTable {
 
 export interface logInroomLogsTable {
     action: string;
-    date: string;
+    date: Timestamp;
     name: string;
 }
 

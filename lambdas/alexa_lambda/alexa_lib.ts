@@ -12,7 +12,7 @@ const AlexaEnterLeaveIntentHandler: RequestHandler = {
         return alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && alexa.getIntentName(handlerInput.requestEnvelope) === 'AlexaEnterLeaveIntent';
     },
-    handle(handlerInput: HandlerInput): Response {
+    async handle(handlerInput: HandlerInput): Promise<Response> {
         console.log("AlexaEnterLeaveIntentHandler was called...");
 
         const inputRoomName: string = alexa.getSlotValue(handlerInput.requestEnvelope, 'room');
@@ -20,7 +20,7 @@ const AlexaEnterLeaveIntentHandler: RequestHandler = {
         console.log("room: " + inputRoomName + " action: " + inputActionName);
 
         // update room status.
-        const inRoomRef = db.collection('state').doc('inroom').withConverter(doc_converter<stateInRoomTable[]>());
+        const inRoomRef = db.collection('state/inroom/rooms').doc(inputRoomName).withConverter(doc_converter<stateInRoomTable>());
 
         let roomState: boolean = false;
         if (inputActionName == '入室') {
@@ -28,29 +28,31 @@ const AlexaEnterLeaveIntentHandler: RequestHandler = {
         }
 
         let setInroomState: stateInRoomTable = {
-            roomName: inputRoomName,
             inState: roomState,
-        }
+        };
 
-        inRoomRef.withConverter(doc_converter<stateInRoomTable>()).update(setInroomState)
-            .then(doc => {
-                console.log('updating ' + inputRoomName + ' to ' + inputActionName + ' was succeed.');
-                // save logs
-                const LogsRef = db.collection('log').doc('Inroom').collection('Logs');
+        try {
+            await inRoomRef.update(setInroomState);
+            console.log('updating ' + inputRoomName + ' to ' + inputActionName + ' was succeed.');
 
-                LogsRef.add({
+            // save logs
+            const logsRef = db.collection('log').doc('Inroom').collection('Logs');
+            try {
+                await logsRef.add({
                     name: inputRoomName,
                     action: inputActionName,
                     date: firebaseadmin.firestore.FieldValue.serverTimestamp()
-                })
-                    .catch((error) => {
-                        console.log('adding log was error.:', error);
-                    });
-            })
-            .catch((error) => {
-                console.log('updating ' + inputRoomName + ' to ' + inputActionName + ' was failed.: %s', error);
-            });
+                });
+            }
+            catch (error) {
+                console.log('adding log for ' + inputRoomName + ' to ' + inputActionName + ' was failed.: %s', error);
+            }
 
+
+        }
+        catch (error) {
+            console.log('updating ' + inputRoomName + ' to ' + inputActionName + ' was failed.: %s', error);
+        }
 
         return handlerInput.responseBuilder
             .getResponse();

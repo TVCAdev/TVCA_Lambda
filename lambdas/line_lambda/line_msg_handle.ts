@@ -1,6 +1,6 @@
 "use strict";
 
-import express, { Express, Request, Response, NextFunction } from 'express';
+import express, { Express, Request, Response } from 'express';
 import lineShowTopmenu from './line_show_topmenu.js';
 import getInRoom from './line_get_inroom.js';
 import showInRoomLogs from './line_show_inroom_logs.js';

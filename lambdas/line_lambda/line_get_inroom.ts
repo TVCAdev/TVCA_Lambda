@@ -9,50 +9,46 @@ import line from '@line/bot-sdk';
 async function getInRoom(line_client: line.Client, event: line.PostbackEvent) {
 
     // read inroom status
-    const inroomRef = db.doc('state/inroom').withConverter(doc_converter<stateInRoomTable[]>());
+    const roomsRef = db.collection('state/inroom/rooms').withConverter(doc_converter<stateInRoomTable>());
 
-    const doc = await inroomRef.get();
-    if (!doc.exists) {
+    const querySnap = await roomsRef.get();
+    if (querySnap.empty) {
         console.log('document inroom was not exist.');
     } else {
         let text_string = "";
         let actions: line.Action[] = [];
-        let dbdata: stateInRoomTable[] | undefined = doc.data();
-        if (dbdata != undefined) {
-            console.log('Document data:', dbdata);
-
-            for (const InRoomData of dbdata) {
-
-                // get registration information for TVbans
-                if (InRoomData.inState == false) {
-                    text_string = text_string + InRoomData.roomName + "：不在\n";
-                }
-                else {
-                    text_string = text_string + InRoomData.roomName + "：在室\n";
-                }
-                let tmpAction: line.Action = {
-                    label: InRoomData.roomName + "のログ表示",
-                    type: "postback",
-                    data: "action=showInroomLogs&room=" + InRoomData.roomName,
-                };
-
-                actions.push(tmpAction);
+        querySnap.forEach(docSnap => {
+            const InRoomData: stateInRoomTable = docSnap.data();
+            // get registration information for TVbans
+            if (InRoomData.inState == false) {
+                text_string = text_string + docSnap.id + "：不在\n";
+            }
+            else {
+                text_string = text_string + docSnap.id + "：在室\n";
+            }
+            let tmpAction: line.Action = {
+                label: docSnap.id + "のログ表示",
+                type: "postback",
+                data: "action=showInroomLogs&room=" + docSnap.id,
             };
 
-            // return button template
-            const message: line.TemplateMessage = {
-                type: "template",
-                altText: "在室状況",
-                template: {
-                    type: "buttons",
-                    text: text_string,
-                    actions: actions
-                }
-            };
+            actions.push(tmpAction);
+        });
 
-            return line_client.replyMessage(event.replyToken, message);
-        }
+        // return button template
+        const message: line.TemplateMessage = {
+            type: "template",
+            altText: "在室状況",
+            template: {
+                type: "buttons",
+                text: text_string,
+                actions: actions
+            }
+        };
+
+        return line_client.replyMessage(event.replyToken, message);
     }
 }
+
 
 export default getInRoom;
