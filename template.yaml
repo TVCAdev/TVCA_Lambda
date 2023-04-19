@@ -8,7 +8,7 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 10
+    Timeout: 30
 
 Parameters:
   FirebaseClientEmail:
@@ -107,14 +107,14 @@ Resources:
     Type: "AWS::Serverless::Function"
     Properties:
       FunctionName: LineLambdaFunction
-      Handler: index.lineHandler
+      Handler: index.handler
       Runtime: nodejs18.x
       Architectures:
         - arm64
       CodeUri: lambdas/line_lambda/
       Description: ""
       MemorySize: 128
-      Timeout: 10
+      Timeout: 30
       Environment:
         Variables:
           FIREBASE_CLIENT_EMAIL: !Ref FirebaseClientEmail
@@ -165,14 +165,14 @@ Resources:
     Type: "AWS::Serverless::Function"
     Properties:
       FunctionName: AlexaLambdaFunction
-      Handler: index.alexaHandler
+      Handler: index.handler
       Runtime: nodejs18.x
       Architectures:
         - arm64
       CodeUri: lambdas/alexa_lambda/
       Description: ""
       MemorySize: 128
-      Timeout: 10
+      Timeout: 30
       Environment:
         Variables:
           ALEXA_ENTERLEAVE_SKILL_ID: !Ref AlexaEnterleaveSkillId
