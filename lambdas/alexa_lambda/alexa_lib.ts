@@ -1,5 +1,5 @@
-import alexa, { ErrorHandler, HandlerInput, RequestHandler, SkillBuilders } from 'ask-sdk-core';
-import { Response, SessionEndedRequest } from 'ask-sdk-model'
+import alexa, { HandlerInput, RequestHandler, SkillBuilders } from 'ask-sdk-core';
+import { Response } from 'ask-sdk-model'
 import firebaseadmin from 'firebase-admin';
 
 import db, { doc_converter, stateInRoomTable } from './db_functions.js';
@@ -60,7 +60,7 @@ const AlexaEnterLeaveIntentHandler: RequestHandler = {
 };
 
 // set alexa handlers
-const skillBuilder = alexa.SkillBuilders // get SkillBuilder
+const skillBuilder = SkillBuilders // get SkillBuilder
     .custom() // get CustomSkillBuilder
     .withSkillId(process.env.ALEXA_ENTERLEAVE_SKILL_ID || '') // whether my skill or not
     .addRequestHandlers(AlexaEnterLeaveIntentHandler)
