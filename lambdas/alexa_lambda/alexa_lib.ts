@@ -1,4 +1,4 @@
-import alexa, { HandlerInput, RequestHandler, SkillBuilders } from 'ask-sdk-core';
+import alexa from 'ask-sdk-core';
 import { Response } from 'ask-sdk-model'
 import firebaseadmin from 'firebase-admin';
 
@@ -7,12 +7,12 @@ import db, { doc_converter, stateInRoomTable } from './db_functions.js';
 /*
  * Function for Alexa IntentRequest
  */
-const AlexaEnterLeaveIntentHandler: RequestHandler = {
-    canHandle(handlerInput: HandlerInput): boolean {
+const AlexaEnterLeaveIntentHandler: alexa.RequestHandler = {
+    canHandle(handlerInput: alexa.HandlerInput): boolean {
         return alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && alexa.getIntentName(handlerInput.requestEnvelope) === 'AlexaEnterLeaveIntent';
     },
-    async handle(handlerInput: HandlerInput): Promise<Response> {
+    async handle(handlerInput: alexa.HandlerInput): Promise<Response> {
         console.log("AlexaEnterLeaveIntentHandler was called...");
 
         const inputRoomName: string = alexa.getSlotValue(handlerInput.requestEnvelope, 'room');
@@ -60,7 +60,7 @@ const AlexaEnterLeaveIntentHandler: RequestHandler = {
 };
 
 // set alexa handlers
-const skillBuilder = SkillBuilders // get SkillBuilder
+const skillBuilder = alexa.SkillBuilders // get SkillBuilder
     .custom() // get CustomSkillBuilder
     .withSkillId(process.env.ALEXA_ENTERLEAVE_SKILL_ID || '') // whether my skill or not
     .addRequestHandlers(AlexaEnterLeaveIntentHandler)
