@@ -1,4 +1,4 @@
-import alexa from 'ask-sdk-core';
+import { HandlerInput, RequestHandler, SkillBuilders, getSlotValue, getRequestType, getIntentName } from 'ask-sdk-core';
 import { Response } from 'ask-sdk-model'
 import firebaseadmin from 'firebase-admin';
 
@@ -7,16 +7,16 @@ import db, { doc_converter, stateInRoomTable } from './db_functions.js';
 /*
  * Function for Alexa IntentRequest
  */
-const AlexaEnterLeaveIntentHandler: alexa.RequestHandler = {
-    canHandle(handlerInput: alexa.HandlerInput): boolean {
-        return alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && alexa.getIntentName(handlerInput.requestEnvelope) === 'AlexaEnterLeaveIntent';
+const AlexaEnterLeaveIntentHandler: RequestHandler = {
+    canHandle(handlerInput: HandlerInput): boolean {
+        return getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && getIntentName(handlerInput.requestEnvelope) === 'AlexaEnterLeaveIntent';
     },
-    async handle(handlerInput: alexa.HandlerInput): Promise<Response> {
+    async handle(handlerInput: HandlerInput): Promise<Response> {
         console.log("AlexaEnterLeaveIntentHandler was called...");
 
-        const inputRoomName: string = alexa.getSlotValue(handlerInput.requestEnvelope, 'room');
-        const inputActionName = alexa.getSlotValue(handlerInput.requestEnvelope, 'action');
+        const inputRoomName: string = getSlotValue(handlerInput.requestEnvelope, 'room');
+        const inputActionName = getSlotValue(handlerInput.requestEnvelope, 'action');
         console.log("room: " + inputRoomName + " action: " + inputActionName);
 
         // update room status.
@@ -60,7 +60,7 @@ const AlexaEnterLeaveIntentHandler: alexa.RequestHandler = {
 };
 
 // set alexa handlers
-const skillBuilder = alexa.SkillBuilders // get SkillBuilder
+const skillBuilder = SkillBuilders // get SkillBuilder
     .custom() // get CustomSkillBuilder
     .withSkillId(process.env.ALEXA_ENTERLEAVE_SKILL_ID || '') // whether my skill or not
     .addRequestHandlers(AlexaEnterLeaveIntentHandler)
