@@ -1,6 +1,6 @@
 "use strict";
 
-import db from './db_functions.js';
+import db, { doc_converter, logInroomLogsTable } from './db_functions.js';
 import date_fns from 'date-fns';
 import line from '@line/bot-sdk';
 
@@ -14,7 +14,8 @@ async function showInRoomLogs(line_client: line.Client, event: line.PostbackEven
     let logtext = roomName + 'のログ一覧(最新20件)\n';
 
     // view logs of target room name
-    const querySnapshot = await db.collection('log').doc('Inroom').collection('Logs')
+    const querySnapshot = await db.collection('log/Inroom/Logs')
+        .withConverter(doc_converter<logInroomLogsTable>())
         .where('name', '==', roomName)
         .orderBy('date', 'desc').limit(20)
         .get();
@@ -27,7 +28,7 @@ async function showInRoomLogs(line_client: line.Client, event: line.PostbackEven
     querySnapshot.forEach(queryDocumentSnapshot => {
         let data = queryDocumentSnapshot.data();
         let date: Date = data.date.toDate();
-        let showDate = date_fns.format(date, 'yyyy/MM/dd HHmmss');
+        let showDate = date_fns.format(date, 'yyyy/MM/dd HH:mm:ss');
 
         logtext = logtext + ' ' + showDate + '-> ' + data.action + 'しました。\n';
         console.log('logtext is %s.', logtext);
