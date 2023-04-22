@@ -13,23 +13,23 @@ async function sendNotification() {
     const locRef = db.collection('config').doc('location').withConverter(doc_converter<configLocationTable>());
     const doc = await locRef.get();
     if (!doc.exists) {
-        console.log('document location was not exist.');
+        console.log('document location of config was not exist.');
     } else {
-        const dbdata: configLocationTable | undefined = doc.data();
-        console.log('Document data:', dbdata);
+        const locData = doc.data();
+        console.log('Document data:', locData);
 
         // get registration token
-        if (dbdata != undefined) {
+        if (locData != undefined) {
             const message = {
                 data: {
                     action: 'GET_LOCATION'
                 },
-                token: dbdata.token,
+                token: locData.token,
             };
 
             // Send a message to the device corresponding to the provided
             // registration token.
-            const response = firebaseadmin.messaging().send(message);
+            const response = await firebaseadmin.messaging().send(message);
             if (response) {
                 // Response is a message ID string.
                 console.log('Successfully sent message:', response);
@@ -48,8 +48,14 @@ async function sendNotification() {
 async function getLocation(line_client: line.Client, event: line.PostbackEvent) {
 
     // register sender ID
-    if (event.source.type == "user" && await setSenderID("getlocation", event.source.userId) == true) {
-        sendNotification();
+    if (event.source.type == "user") {
+        try {
+            await setSenderID('getlocation', event.source.userId);
+            await sendNotification();
+        }
+        catch {
+            console.log('register senderID of getlocation request was failed');
+        }
     }
 }
 
