@@ -1,7 +1,7 @@
 'use strict';
 
 import express from 'express';
-import db from './db_functions.js';
+import db, { doc_converter, configLocationTable } from './db_functions.js';
 import { getSenderIDs } from './tools_functions.js';
 import { line_client } from './line_functions.js';
 /**
@@ -32,16 +32,15 @@ async function where_are_you_handle(app: express.Express) {
             // case of register token
             if ('token' in req.body && req.body.token != null) {
                 // register token to firebase cloud firestore
-                const locRef = db.collection('config').doc('location');
+                const locRef = db.collection('config').doc('location').withConverter(doc_converter<configLocationTable>());
 
-                locRef
-                    .set({ token: req.body.token })
-                    .then(() => {
-                        console.log('registering token was succeed.');
-                    })
-                    .catch((error) => {
-                        console.log('registering token was failed...:', error);
-                    });
+                try {
+                    await locRef.set({ token: req.body.token });
+                    console.log('registering token was succeed.');
+                }
+                catch (error) {
+                    console.log('registering token was failed...:', error);
+                };
             }
             // case of response getting location
             else if (

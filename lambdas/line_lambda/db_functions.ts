@@ -24,8 +24,7 @@ export interface stateInRoomTable {
 }
 
 export interface requestTable {
-    userID: string;
-    reqDate: string;
+    reqDate: Timestamp;
 }
 
 export interface configLocationTable {
