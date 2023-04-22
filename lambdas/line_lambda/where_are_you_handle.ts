@@ -64,7 +64,7 @@ async function where_are_you_handle(app: express.Express) {
                     console.log('senderIDs data:', senderIDs);
 
                     for (const senderID of senderIDs) {
-                        line_client.pushMessage(senderID, {
+                        await line_client.pushMessage(senderID, {
                             type: 'location',
                             title: 'パパの現在地',
                             address: 'パパの現在地',
