@@ -47,6 +47,8 @@ async function sendNotification() {
  */
 async function getLocation(line_client: line.Client, event: line.PostbackEvent) {
 
+    console.log('event data:', event);
+
     // register sender ID
     if (event.source.type == "user") {
         try {

@@ -20,10 +20,11 @@ export async function setSenderID(target: string, setID: string) {
     // set sender IDs
     try {
         await targetRef.doc(setID).set(set_req);
+        console.log('register ' + setID + ' in request of ' + target + ' was succeed.');
     }
     catch
     {
-        console.log('register ' + setID + ' in request of ' + target + '.');
+        console.log('register ' + setID + ' in request of ' + target + ' was failed.');
     }
 }
 
