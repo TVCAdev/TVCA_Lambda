@@ -57,9 +57,12 @@ async function where_are_you_handle(app: express.Express) {
                 const senderIDs = await getSenderIDs('getlocation', 30);
 
                 if (senderIDs == null) {
-                    res.status(200).end()
+                    console.log('No senderIDs...');
+                    res.status(200).end();
                 }
                 else {
+                    console.log('senderIDs data:', senderIDs);
+
                     for (const senderID of senderIDs) {
                         line_client.pushMessage(senderID, {
                             type: 'location',
