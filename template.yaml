@@ -146,8 +146,10 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
+        Format: esm
         Minify: false
-        Target: "es2020"
+        OutExtension:
+          - .js=.mjs
         EntryPoints:
           - index.ts
         External:
