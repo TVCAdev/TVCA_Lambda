@@ -35,6 +35,18 @@ Parameters:
   AlexaEnterleaveSkillId:
     Type: String
 
+  CameraDataLocationUrl:
+    Type: String
+
+  CaneraDataUrlToken:
+    Type: String
+
+  CameraDataOrigFileName:
+    Type: String
+
+  CameraDataPrevFileName:
+    Type: String
+
 Resources:
   ###############
   # API GATEWAY #
@@ -46,6 +58,29 @@ Resources:
       EndpointConfiguration:
         Type: REGIONAL
       StageName: work
+
+  WebsocketApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: WebsocketApiGateway
+      EndpointConfiguration:
+        Type: REGIONAL
+      StageName: work
+
+  #############
+  # SNS TOPIC #
+  #############
+  CamDataTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: CamDataTopic
+
+  CamDataSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !Ref SnSLambdaFunction
+      Protocol: "lambda"
+      TopicArn: !Ref CamDataTopic
 
   ##########
   # LAYERS #
@@ -90,6 +125,16 @@ Resources:
       CompatibleArchitectures:
         - arm64
 
+  AwsSdkLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: AwsSdkLayer
+      ContentUri: layers/layer_awssdk/
+      CompatibleRuntimes:
+        - nodejs18.x
+      CompatibleArchitectures:
+        - arm64
+
   ToolsLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -124,12 +169,15 @@ Resources:
           LINE_CHANNEL_SECRET: !Ref LineChannelSecret
           WHERE_ARE_YOU_LOCATION_URL: !Ref WhereAreYouLocationUrl
           WHERE_ARE_YOU_URL_TOKEN: !Ref WhereAreYouUrlToken
+          CAMERA_DATA_LOCATION_URL: !Ref CameraDataLocationUrl
+          CAMERA_DATA_URL_TOKEN: !Ref CameraDataUrlToken
+          CAMERA_DATA_ORIGFILENAME: !Ref CameraDataOrigFileName
+          CAMERA_DATA_PREVFILENAME: !Ref CameraDataPrevFileName
       Layers:
         - !Ref LineLayer
         - !Ref ExpressLayer
         - !Ref FirebaseLayer
         - !Ref ToolsLayer
-
       Events:
         LineApiRootEvent:
           Type: Api
@@ -158,7 +206,6 @@ Resources:
           - "@line/bot-sdk"
           - "firebase-admin/app"
           - "firebase-admin"
-          - "firebase-admin/app"
           - "firebase-admin/firestore"
           - "date-fns"
 
@@ -197,6 +244,106 @@ Resources:
           - "firebase-admin/app"
           - "firebase-admin/firestore"
 
+  WebsocketLambdaFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      FunctionName: WebsocketLambdaFunction
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      CodeUri: lambdas/websocket_lambda/
+      Description: ""
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          FIREBASE_CLIENT_EMAIL: !Ref FirebaseClientEmail
+          FIREBASE_PRIVATE_KEY: !Ref FirebasePrivateKey
+          FIREBASE_PROJECT_ID: !Ref FirebaseProjectId
+      Layers:
+        - !Ref FirebaseLayer
+        - !Ref ToolsLayer
+      Events:
+        WebsocketConnectEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref WebsocketApi
+            Path: /{proxy+}
+            Method: $connect
+        WebsocketDisconnectEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref WebsocketApi
+            Path: /{proxy+}
+            Method: $disconnect
+        WebsocketSendCamDataEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref WebsocketApi
+            Path: /{proxy+}
+            Method: SendCamData
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: esm
+        Minify: false
+        OutExtension:
+          - .js=.mjs
+        EntryPoints:
+          - index.ts
+        External:
+          - "firebase-admin/app"
+          - "firebase-admin"
+          - "firebase-admin/firestore"
+          - "aws-sdk"
+
+  SnSLambdaFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      FunctionName: SnsLambdaFunction
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      CodeUri: lambdas/sns_lambda/
+      Description: ""
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          FIREBASE_CLIENT_EMAIL: !Ref FirebaseClientEmail
+          FIREBASE_PRIVATE_KEY: !Ref FirebasePrivateKey
+          FIREBASE_PROJECT_ID: !Ref FirebaseProjectId
+          CAMERA_DATA_LOCATION_URL: !Ref CameraDataLocationUrl
+          CAMERA_DATA_URL_TOKEN: !Ref CameraDataUrlToken
+          CAMERA_DATA_ORIGFILENAME: !Ref CameraDataOrigFileName
+          CAMERA_DATA_PREVFILENAME: !Ref CameraDataPrevFileName
+      Layers:
+        - !Ref LineLayer
+        - !Ref FirebaseLayer
+        - !Ref ToolsLayer
+      Events:
+        SnSCamDataEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref CamDataTopic
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: esm
+        Minify: false
+        OutExtension:
+          - .js=.mjs
+        EntryPoints:
+          - index.ts
+        External:
+          - "@line/bot-sdk"
+          - "firebase-admin/app"
+          - "firebase-admin"
+          - "firebase-admin/firestore"
+          - "date-fns"
+
   #############
   # LOG GROUP #
   #############
@@ -214,6 +361,20 @@ Resources:
       RetentionInDays: 7
     DependsOn: AlexaLambdaFunction
 
+  WebsocketLambdaFuncLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${WebsocketLambdaFunction}
+      RetentionInDays: 7
+    DependsOn: WebsocketLambdaFunction
+
+  SnsLambdaFuncLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${SnsLambdaFunction}
+      RetentionInDays: 7
+    DependsOn: SnsLambdaFunction
+
 Outputs:
   # ServerloessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
@@ -227,6 +388,9 @@ Outputs:
   AlexaLambdaFunction:
     Description: "Alexa Lambda Function ARN"
     Value: !GetAtt AlexaLambdaFunction.Arn
-#  HelloWorldFunctionIamRole:
-#    Description: "Implicit IAM Role created for Hello World function"
-#    Value: !GetAtt HelloWorldFunctionRole.Arn
+  WebsocketLambdaFunction:
+    Description: "Websocket Lambda Function ARN"
+    Value: !GetAtt WebsocketLambdaFunction.Arn
+  SnsLambdaFunction:
+    Description: "Sns Lambda Function ARN"
+    Value: !GetAtt SnsLambdaFunction.Arn

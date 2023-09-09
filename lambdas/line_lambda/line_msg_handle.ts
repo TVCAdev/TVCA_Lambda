@@ -53,6 +53,11 @@ function handleEvent(event: line.WebhookEvent) {
             return getLocation(line_client, event);
         }
 
+        // selected GET LOCATION
+        else if (event.postback.data == "action=TVStatus") {
+            return getLocation(line_client, event);
+        }
+
         else {
             // receive only text message or postback
             return Promise.resolve(null);
