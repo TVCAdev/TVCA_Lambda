@@ -38,7 +38,7 @@ Parameters:
   CameraDataLocationUrl:
     Type: String
 
-  CaneraDataUrlToken:
+  CameraDataUrlToken:
     Type: String
 
   CameraDataOrigFileName:
