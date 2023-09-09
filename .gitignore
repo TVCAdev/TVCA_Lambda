@@ -207,8 +207,5 @@ $RECYCLE.BIN/
 
 # AWS SAM etc...
 samconfig.toml
-lambdas/alexa_lambda/db_functions.ts
-lambdas/websocket_lambda/db_functions.ts
-lambdas/sns_lambda/db_functions.ts
 
 # End of https://www.toptal.com/developers/gitignore/api/osx,node,linux,windows,sam

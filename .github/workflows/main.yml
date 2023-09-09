@@ -26,7 +26,6 @@ jobs:
       - run: npm install
         working-directory: ./layers/layer_tools/nodejs
       - run: sed s/arm64/x86_64/g template.yaml > template_github_actions.yaml
-      - run: cp -p lambdas/line_lambda/db_functions.ts lambdas/alexa_lambda/db_functions.ts
       - run: sam build --use-container -t template_github_actions.yaml --debug --config-file samconfig_github_actions.toml
       - run: sam deploy
           --no-confirm-changeset
