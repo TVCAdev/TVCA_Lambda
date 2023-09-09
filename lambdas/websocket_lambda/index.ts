@@ -2,18 +2,20 @@
 
 import db, { doc_converter, requestTable } from './db_functions.js';
 import firebaseadmin from 'firebase-admin';
-import AWS from 'aws-sdk';
+import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 
 // function to add websocket's connecton ID
-async function addConnectionID(target: string, setID: string) {
+async function addConnectionID(target: string, setID: string, setDomain: string, setStage: string) {
     // get token from location document.
-    const targetRef = db.collection('state/websockets/' + target + '_connected').withConverter(doc_converter<requestTable>());
+    const targetRef = db.collection('state/websockets/' + target + '_connected');
 
     // create now time
     const nowDate = new Date();
 
-    let set_req: requestTable = {
+    let set_req = {
         reqDate: firebaseadmin.firestore.Timestamp.fromDate(nowDate),
+        domain: setDomain,
+        stage: setStage,
     }
 
     // set websockets connection IDs
@@ -32,10 +34,11 @@ export const handler = async (event) => {
     switch (event.requestContext.routeKey) {
         case '$connect':
             console.log('connection was detected.');
-            // add connectionId to DB
+            // add connectionId,domain,stage to DB
             if (event.requestContext.connectionId) {
                 try {
-                    await addConnectionID('getlivcam', event.requestContext.connectionId);
+                    await addConnectionID('getlivcam', event.requestContext.connectionId,
+                        event.requestContext.domainName, event.requestContext.stage);
                 }
                 catch {
                     console.log('register connectionId of getlivcam request was failed');
@@ -84,13 +87,13 @@ export const handler = async (event) => {
             }
 
             // send aws sns to lambda by topic camera_data
-            const sns = new AWS.SNS();
+            const sns = new SNSClient({ region: 'us-east-1' });
             const params = {
                 Message: JSON.stringify({ type: type }),
-                TopicArn: 'arn:aws:sns:us-east-1:646209519660:camera_data'
+                TopicArn: process.env.CAMDATA_TOPIC_ARN
             };
             try {
-                await sns.publish(params).promise();
+                await sns.send(new PublishCommand(params));
             }
             catch {
                 console.log('send sns was failed');

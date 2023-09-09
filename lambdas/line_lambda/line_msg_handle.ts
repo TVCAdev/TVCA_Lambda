@@ -5,6 +5,8 @@ import lineShowTopmenu from './line_show_topmenu.js';
 import getInRoom from './line_get_inroom.js';
 import showInRoomLogs from './line_show_inroom_logs.js';
 import getLocation from './line_get_location.js';
+import getPicList from './line_get_piclist.js';
+import showPicture from './line_show_picture.js';
 import line from '@line/bot-sdk';
 import { line_client, line_middle_config } from './line_functions.js';
 
@@ -53,9 +55,14 @@ function handleEvent(event: line.WebhookEvent) {
             return getLocation(line_client, event);
         }
 
-        // selected GET LOCATION
-        else if (event.postback.data == "action=TVStatus") {
-            return getLocation(line_client, event);
+        // selected GET PICTURE MENU
+        else if (event.postback.data == "action=getpiclist") {
+            return getPicList(line_client, event);
+        }
+
+        // selected GET PICTURE
+        else if (event.postback.data.startsWith("action=showPic")) {
+            return showPicture(line_client, event);
         }
 
         else {

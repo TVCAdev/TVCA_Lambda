@@ -17,8 +17,8 @@ function lineShowTopmenu(line_client: line.Client, event: MessageEvent) {
             actions: [
                 {
                     "type": "postback",
-                    "label": "リビングの現在画像",
-                    "data": "action=getpic"
+                    "label": "家の画像",
+                    "data": "action=getpiclist"
                 },
                 {
                     "type": "postback",

@@ -261,6 +261,7 @@ Resources:
           FIREBASE_CLIENT_EMAIL: !Ref FirebaseClientEmail
           FIREBASE_PRIVATE_KEY: !Ref FirebasePrivateKey
           FIREBASE_PROJECT_ID: !Ref FirebaseProjectId
+          CAMDATA_TOPIC_ARN: !Ref CamDataTopic
       Layers:
         - !Ref FirebaseLayer
         - !Ref ToolsLayer

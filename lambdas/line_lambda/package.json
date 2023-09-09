@@ -33,6 +33,7 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.409.0",
     "esbuild": "^0.17.12"
   }
 }
