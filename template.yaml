@@ -78,7 +78,7 @@ Resources:
   CamDataSubscription:
     Type: AWS::SNS::Subscription
     Properties:
-      Endpoint: !Ref SnSLambdaFunction
+      Endpoint: !GetAtt SnSLambdaFunction.Arn
       Protocol: "lambda"
       TopicArn: !Ref CamDataTopic
 
