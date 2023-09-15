@@ -80,7 +80,7 @@ Resources:
     Properties:
       Endpoint: !GetAtt SnSLambdaFunction.Arn
       Protocol: "lambda"
-      TopicArn: !Ref CamDataTopic
+      TopicArn: !GetAtt CamDataTopic.Arn
 
   ##########
   # LAYERS #
@@ -328,7 +328,7 @@ Resources:
         SnSCamDataEvent:
           Type: SNS
           Properties:
-            Topic: !Ref CamDataTopic
+            Topic: !GetAtt CamDataTopic.Arn
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
