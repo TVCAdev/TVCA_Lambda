@@ -324,11 +324,11 @@ Resources:
         - !Ref LineLayer
         - !Ref FirebaseLayer
         - !Ref ToolsLayer
-      Events:
-        SnSCamDataEvent:
-          Type: SNS
-          Properties:
-            Topic: !GetAtt CamDataTopic.Arn
+      # Events:
+      #   SnSCamDataEvent:
+      #     Type: SNS
+      #     Properties:
+      #       Topic: !GetAtt CamDataTopic.Arn
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
