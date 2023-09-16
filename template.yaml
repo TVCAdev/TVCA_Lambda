@@ -292,7 +292,7 @@ Resources:
           - "firebase-admin/firestore"
           - "aws-sdk"
 
-  SnSLambdaFunction:
+  SnsLambdaFunction:
     Type: "AWS::Serverless::Function"
     Properties:
       FunctionName: SnsLambdaFunction
@@ -309,6 +309,8 @@ Resources:
           FIREBASE_CLIENT_EMAIL: !Ref FirebaseClientEmail
           FIREBASE_PRIVATE_KEY: !Ref FirebasePrivateKey
           FIREBASE_PROJECT_ID: !Ref FirebaseProjectId
+          LINE_CHANNEL_ACCESS_TOKEN: !Ref LineChannelAccessToken
+          LINE_CHANNEL_SECRET: !Ref LineChannelSecret
           CAMERA_DATA_LOCATION_URL: !Ref CameraDataLocationUrl
           CAMERA_DATA_URL_TOKEN: !Ref CameraDataUrlToken
           CAMERA_DATA_ORIGFILENAME: !Ref CameraDataOrigFileName
