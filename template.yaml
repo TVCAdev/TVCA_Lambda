@@ -75,13 +75,6 @@ Resources:
     Properties:
       TopicName: CamDataTopic
 
-  CamDataSubscription:
-    Type: AWS::SNS::Subscription
-    Properties:
-      Endpoint: !GetAtt SnSLambdaFunction.Arn
-      Protocol: "lambda"
-      TopicArn: !GetAtt CamDataTopic.Arn
-
   ##########
   # LAYERS #
   ##########
@@ -324,11 +317,11 @@ Resources:
         - !Ref LineLayer
         - !Ref FirebaseLayer
         - !Ref ToolsLayer
-      # Events:
-      #   SnSCamDataEvent:
-      #     Type: SNS
-      #     Properties:
-      #       Topic: !GetAtt CamDataTopic.Arn
+      Events:
+        SnSCamDataEvent:
+          Type: SNS
+          Properties:
+            Topic: !GetAtt CamDataTopic.Arn
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
