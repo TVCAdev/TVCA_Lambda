@@ -60,12 +60,66 @@ Resources:
       StageName: work
 
   WebsocketApi:
-    Type: AWS::Serverless::Api
+    Type: AWS::ApiGatewayV2::Api
     Properties:
       Name: WebsocketApiGateway
-      EndpointConfiguration:
-        Type: REGIONAL
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: $request.body.action
+
+  WebsocketApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref WebsocketApi
       StageName: work
+      AutoDeploy: true
+
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebsocketApi
+      RouteKey: $connect
+      AuthorizationType: NONE
+      OperationName: ConnectRoute
+      Target: !Sub integrations/${ConnectIntegration}
+
+  ConnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebsocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WebsocketLambdaFunction.Arn}/invocations
+
+  DisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebsocketApi
+      RouteKey: $disconnect
+      AuthorizationType: NONE
+      OperationName: DisconnectRoute
+      Target: !Sub integrations/${DisconnectIntegration}
+
+  DisconnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebsocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WebsocketLambdaFunction.Arn}/invocations
+
+  SendCamDataRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebsocketApi
+      RouteKey: SendCamData
+      AuthorizationType: NONE
+      OperationName: SendCamDataRoute
+      Target: !Sub integrations/${SendCamDataIntegration}
+
+  SendCamDataIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebsocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WebsocketLambdaFunction.Arn}/invocations
 
   #############
   # SNS TOPIC #
