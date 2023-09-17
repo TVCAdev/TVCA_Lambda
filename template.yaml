@@ -221,9 +221,10 @@ Resources:
           CAMERA_DATA_ORIGFILENAME: !Ref CameraDataOrigFileName
           CAMERA_DATA_PREVFILENAME: !Ref CameraDataPrevFileName
       Layers:
-        - !Ref LineLayer
+        - !Ref AwsSdkLayer
         - !Ref ExpressLayer
         - !Ref FirebaseLayer
+        - !Ref LineLayer
         - !Ref ToolsLayer
       Events:
         LineApiRootEvent:
@@ -310,6 +311,7 @@ Resources:
           FIREBASE_PROJECT_ID: !Ref FirebaseProjectId
           CAMDATA_TOPIC_ARN: !Ref CamDataTopic
       Layers:
+        - !Ref AwsSdkLayer
         - !Ref FirebaseLayer
         - !Ref ToolsLayer
       Events:
