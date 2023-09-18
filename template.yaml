@@ -249,6 +249,9 @@ Resources:
         EntryPoints:
           - index.ts
         External:
+          - "ask-sdk"
+          - "@aws-sdk/client-apigatewaymanagementapi"
+          - "@aws-sdk/client-sns"
           - "@vendia/serverless-express"
           - "express"
           - "@line/bot-sdk"
