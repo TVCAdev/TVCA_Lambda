@@ -239,6 +239,7 @@ Resources:
             RestApiId: !Ref LineExpressApi
             Path: /{proxy+}
             Method: ANY
+    DependsOn: LineExpressApi
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -249,7 +250,6 @@ Resources:
         EntryPoints:
           - index.ts
         External:
-          - "ask-sdk"
           - "@aws-sdk/client-apigatewaymanagementapi"
           - "@aws-sdk/client-sns"
           - "@vendia/serverless-express"
@@ -336,6 +336,7 @@ Resources:
             RestApiId: !Ref WebsocketApi
             Path: /{proxy+}
             Method: SendCamData
+    DependsOn: WebsocketApi
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -346,10 +347,21 @@ Resources:
         EntryPoints:
           - index.ts
         External:
+          - "@aws-sdk/client-apigatewaymanagementapi"
+          - "@aws-sdk/client-sns"
           - "firebase-admin/app"
           - "firebase-admin"
           - "firebase-admin/firestore"
           - "aws-sdk"
+
+  WebsocketLambdaFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt WebsocketLambdaFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/*/*/*
+    DependsOn: WebsocketApi
 
   SnsLambdaFunction:
     Type: "AWS::Serverless::Function"
