@@ -239,7 +239,6 @@ Resources:
             RestApiId: !Ref LineExpressApi
             Path: /{proxy+}
             Method: ANY
-    DependsOn: LineExpressApi
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
