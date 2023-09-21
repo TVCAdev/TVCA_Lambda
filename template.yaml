@@ -359,7 +359,7 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt WebsocketLambdaFunction.Arn
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/*/*/*
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/work/*
     DependsOn: WebsocketApi
 
   SnsLambdaFunction:
