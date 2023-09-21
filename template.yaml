@@ -316,25 +316,25 @@ Resources:
         - !Ref AwsSdkLayer
         - !Ref FirebaseLayer
         - !Ref ToolsLayer
-      Events:
-        WebsocketConnectEvent:
-          Type: Api
-          Properties:
-            RestApiId: !Ref WebsocketApi
-            Path: /{proxy+}
-            Method: $connect
-        WebsocketDisconnectEvent:
-          Type: Api
-          Properties:
-            RestApiId: !Ref WebsocketApi
-            Path: /{proxy+}
-            Method: $disconnect
-        WebsocketSendCamDataEvent:
-          Type: Api
-          Properties:
-            RestApiId: !Ref WebsocketApi
-            Path: /{proxy+}
-            Method: SendCamData
+      # Events:
+      #   WebsocketConnectEvent:
+      #     Type: Api
+      #     Properties:
+      #       RestApiId: !Ref WebsocketApi
+      #       Path: /{proxy+}
+      #       Method: $connect
+      #   WebsocketDisconnectEvent:
+      #     Type: Api
+      #     Properties:
+      #       RestApiId: !Ref WebsocketApi
+      #       Path: /{proxy+}
+      #       Method: $disconnect
+      #   WebsocketSendCamDataEvent:
+      #     Type: Api
+      #     Properties:
+      #       RestApiId: !Ref WebsocketApi
+      #       Path: /{proxy+}
+      #       Method: SendCamData
     DependsOn: WebsocketApi
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
