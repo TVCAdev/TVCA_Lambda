@@ -22,12 +22,11 @@ async function showPicture(line_client: line.Client, event: line.PostbackEvent) 
         const websocketClientDocs = await websocketInfoRef.get();
         let callbackURL = "";
         websocketClientDocs.forEach(doc => {
-            callbackURL = doc.data().domain + "/" + doc.data().stage + "/@connections/" + doc.id;
+            callbackURL = "https://" + doc.data().domain + "/" + doc.data().stage;
 
             // create websocket client
             const websocketClient = new ApiGatewayManagementApiClient({
-                apiVersion: "2018-11-29",
-                endpoint: callbackURL,
+                endpoint: callbackURL
             });
 
             // send message to websocket
@@ -38,11 +37,14 @@ async function showPicture(line_client: line.Client, event: line.PostbackEvent) 
                 ConnectionId: doc.id,
             };
             const command = new PostToConnectionCommand(params);
-            websocketClient.send(command);
-        }
-        );
 
-
+            try {
+                websocketClient.send(command);
+            }
+            catch (error) {
+                console.error(error);
+            }
+        });
     }
 }
 
