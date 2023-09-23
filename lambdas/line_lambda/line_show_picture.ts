@@ -22,7 +22,7 @@ async function showPicture(line_client: line.Client, event: line.PostbackEvent) 
         const websocketClientDocs = await websocketInfoRef.get();
         let callbackURL = "";
         websocketClientDocs.forEach(async doc => {
-            callbackURL = "https://" + doc.data().domain + "/" + doc.data().stage;
+            callbackURL = "wss://" + doc.data().domain + "/" + doc.data().stage;
             console.log("send message to " + callbackURL + " with ID(" + doc.id + ").");
 
             // create websocket client
