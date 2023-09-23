@@ -21,8 +21,9 @@ async function showPicture(line_client: line.Client, event: line.PostbackEvent) 
         const websocketInfoRef = db.collection('state/websockets/getlivcam_connected');
         const websocketClientDocs = await websocketInfoRef.get();
         let callbackURL = "";
-        websocketClientDocs.forEach(doc => {
+        websocketClientDocs.forEach(async doc => {
             callbackURL = "https://" + doc.data().domain + "/" + doc.data().stage;
+            console.log("send message to " + callbackURL + " with ID(" + doc.id + ").");
 
             // create websocket client
             const websocketClient = new ApiGatewayManagementApiClient({
@@ -39,7 +40,7 @@ async function showPicture(line_client: line.Client, event: line.PostbackEvent) 
             const command = new PostToConnectionCommand(params);
 
             try {
-                websocketClient.send(command);
+                await websocketClient.send(command);
             }
             catch (error) {
                 console.error(error);
