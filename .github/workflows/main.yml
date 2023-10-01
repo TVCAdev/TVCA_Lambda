@@ -41,6 +41,8 @@ jobs:
           "LineChannelAccessToken='${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}'"
           "LineChannelSecret='${{ secrets.LINE_CHANNEL_SECRET }}'"
           "WhereAreYouLocationUrl='${{ secrets.WHEREAREYOU_LOCATION_URL }}'"
+          "WhereAreYouUrlToken='${{ secrets.WHEREAREYOU_URL_TOKEN }}'"
+          "AlexaEnterleaveSkillId='${{ secrets.ALEXA_ENTERLEAVE_SKILL_ID }}'"
           "CameraDataLocationUrl='${{ secrets.CAMERA_DATA_LOCATION_URL }}'"
           "CameraDataUrlToken='${{ secrets.CAMERA_DATA_URL_TOKEN }}'"
           "CameraDataOrigFileName='${{ secrets.CAMERA_DATA_ORIGFILENAME }}'"
