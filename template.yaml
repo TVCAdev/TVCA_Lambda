@@ -239,6 +239,14 @@ Resources:
             RestApiId: !Ref LineExpressApi
             Path: /{proxy+}
             Method: ANY
+      Policies:
+        -statement:
+          - Effect: Allow
+            Action:
+              - "execute-api:MangeConnections"
+            Resource:
+              - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/*
+
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
