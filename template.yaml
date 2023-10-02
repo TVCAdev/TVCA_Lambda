@@ -243,9 +243,9 @@ Resources:
         - Statement:
             - Effect: Allow
               Action:
-                - "execute-api:MangeConnections"
+                - "execute-api:ManageConnections"
               Resource:
-                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/*
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebsocketApi}/work/POST/@connections/*
 
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
