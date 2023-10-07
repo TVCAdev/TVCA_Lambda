@@ -418,6 +418,20 @@ Resources:
   #############
   # LOG GROUP #
   #############
+  LineExpressApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${LineExpressApi}
+      RetentionInDays: 7
+    DependsOn: LineExpressApi
+
+  WebsocketApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${WebsocketApi}
+      RetentionInDays: 7
+    DependsOn: WebsocketApi
+
   LineLambdaFuncLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
