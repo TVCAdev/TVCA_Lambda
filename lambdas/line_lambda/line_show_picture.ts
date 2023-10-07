@@ -23,7 +23,6 @@ async function showPicture(line_client: line.Client, event: line.PostbackEvent) 
         let callbackURL = "";
         websocketClientDocs.forEach(async doc => {
             callbackURL = "https://" + doc.data().domain + "/" + doc.data().stage;
-            console.log("send message to " + callbackURL + " with ID(" + doc.id + ").");
 
             // create websocket client
             const websocketClient = new ApiGatewayManagementApiClient({
@@ -41,6 +40,7 @@ async function showPicture(line_client: line.Client, event: line.PostbackEvent) 
 
             try {
                 await websocketClient.send(command);
+                console.log("send message to " + callbackURL + " with ID(" + doc.id + ").");
             }
             catch (error) {
                 console.error(error);
