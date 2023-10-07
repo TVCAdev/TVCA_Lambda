@@ -421,14 +421,14 @@ Resources:
   LineExpressApiLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /aws/apigateway/${LineExpressApi}
+      LogGroupName: !Sub /aws/apigateway/${LineExpressApi}/work
       RetentionInDays: 7
     DependsOn: LineExpressApi
 
   WebsocketApiLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /aws/apigateway/${WebsocketApi}
+      LogGroupName: !Sub /aws/apigateway/${WebsocketApi}/work
       RetentionInDays: 7
     DependsOn: WebsocketApi
 
