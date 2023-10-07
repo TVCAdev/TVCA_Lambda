@@ -69,17 +69,19 @@ export const handler = async (event) => {
             }
             break;
 
-        case 'sendCamData':
+        case 'SendCamData':
             console.log("reply of GET_LIVINGPIC was received")
             // get camera data(base64) from body.camdata
-            const camdata = JSON.parse(event.body).camdata;
-            const type = JSON.parse(event.body).type;
+            const recvdata = JSON.parse(event.body);
+            const camdata = recvdata.image_data;
+            const occured_date = recvdata.occured_date;
+            const type = recvdata.type;
 
             // get document from firebase
-            const targetRef = db.doc('request/getlivcam')
+            const targetRef = db.doc('request/' + type)
             // put camdata to document(getlivcam) in firebase as field camdata
             try {
-                await targetRef.set({ camdata: camdata });
+                await targetRef.set({ camdata: camdata, occured_date: occured_date });
             }
             catch {
                 console.log('put camdata to getlivcam was failed');
