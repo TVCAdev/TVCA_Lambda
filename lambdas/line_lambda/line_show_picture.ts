@@ -19,33 +19,45 @@ async function showPicture(line_client: line.Client, event: line.PostbackEvent) 
 
         // get callback URL from DB
         const websocketInfoRef = db.collection('state/websockets/getlivcam_connected');
-        const websocketClientDocs = await websocketInfoRef.get();
+        let websocketClientDocs;
+        try {
+            websocketClientDocs = await websocketInfoRef.get();
+        }
+        catch (error) {
+            console.error("fail to get websocketClientDocs");
+            console.error(error);
+        }
         let callbackURL = "";
-        websocketClientDocs.forEach(async doc => {
-            callbackURL = "https://" + doc.data().domain + "/" + doc.data().stage;
+        if (websocketClientDocs !== undefined) {
+            websocketClientDocs.forEach(async doc => {
+                callbackURL = "https://" + doc.data().domain + "/" + doc.data().stage;
 
-            // create websocket client
-            const websocketClient = new ApiGatewayManagementApiClient({
-                endpoint: callbackURL
+                // create websocket client
+                const websocketClient = new ApiGatewayManagementApiClient({
+                    endpoint: callbackURL
+                });
+
+                // send message to websocket
+                const params = {
+                    Data: JSON.stringify({
+                        action: "showPicNowLivCam",
+                    }),
+                    ConnectionId: doc.id,
+                };
+                const command = new PostToConnectionCommand(params);
+
+                try {
+                    await websocketClient.send(command);
+                    console.log("send message to " + callbackURL + " with ID(" + doc.id + ").");
+                }
+                catch (error) {
+                    console.error(error);
+                }
             });
-
-            // send message to websocket
-            const params = {
-                Data: JSON.stringify({
-                    action: "showPicNowLivCam",
-                }),
-                ConnectionId: doc.id,
-            };
-            const command = new PostToConnectionCommand(params);
-
-            try {
-                await websocketClient.send(command);
-                console.log("send message to " + callbackURL + " with ID(" + doc.id + ").");
-            }
-            catch (error) {
-                console.error(error);
-            }
-        });
+        }
+        else {
+            console.error("websocketClientDocs is undefined");
+        }
     }
 }
 
