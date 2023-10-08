@@ -28,8 +28,9 @@ async function showPicture(line_client: line.Client, event: line.PostbackEvent) 
             console.error(error);
         }
         let callbackURL = "";
-        if (websocketClientDocs !== undefined) {
-            websocketClientDocs.forEach(async doc => {
+        if (websocketClientDocs !== undefined && websocketClientDocs.empty !== true) {
+            const all_docs = websocketClientDocs.docs;
+            for (const doc of all_docs) {
                 console.log("prepare send message(" + doc.id + ") cec_control at Websocket");
                 callbackURL = "https://" + doc.data().domain + "/" + doc.data().stage;
 
@@ -54,7 +55,7 @@ async function showPicture(line_client: line.Client, event: line.PostbackEvent) 
                 catch (error) {
                     console.error(error);
                 }
-            });
+            };
         }
         else {
             console.error("websocketClientDocs is undefined");
