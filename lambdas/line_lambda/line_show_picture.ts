@@ -30,6 +30,7 @@ async function showPicture(line_client: line.Client, event: line.PostbackEvent) 
         let callbackURL = "";
         if (websocketClientDocs !== undefined) {
             websocketClientDocs.forEach(async doc => {
+                console.log("prepare send message(" + doc.id + ") cec_control at Websocket");
                 callbackURL = "https://" + doc.data().domain + "/" + doc.data().stage;
 
                 // create websocket client
@@ -58,6 +59,7 @@ async function showPicture(line_client: line.Client, event: line.PostbackEvent) 
         else {
             console.error("websocketClientDocs is undefined");
         }
+        console.error("end of action=showPicNowLivCam...");
     }
 }
 
