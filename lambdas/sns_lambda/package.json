@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@line/bot-sdk": "^7.5.2",
+    "@line/bot-sdk": "^7.7.0",
     "aws-sdk": "^2.1450.0",
     "date-fns": "^2.30.0",
     "esbuild": "^0.19.2",
